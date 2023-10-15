@@ -12,7 +12,7 @@ namespace GameEngineApp
                 new ScreenEng(512,512), 
                 "Game Test", 
                 new Renderer(),
-                new GameLoop());
+                GameLoop.Instance);
             Debug.WriteLine("Beyond engine scope");
         }
     }

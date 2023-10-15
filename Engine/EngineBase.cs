@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
-    public abstract class EngineBase //: IRenderer
+    public abstract class EngineBase : IEngine
     {
         //Include any base game/engine details
         private ScreenEng screen = new ScreenEng(512,512);
@@ -28,18 +28,74 @@ namespace GameEngineApp.Engine
             canvas = new Canvas();
             canvas.Size = new Size((int)screen.X, (int)screen.Y);
             canvas.Text = title;
+            //TODO: Intercept this renderer callback and let it know what to draw...
+            //Consider static/global entity management?
             canvas.Paint += renderer.Renderer;
             canvas.FormClosing += StopLoop;
             
             //Thread already active, just point the loop hooks to the right place
-            gameLoop.GameRedraw += canvas.RedrawCallback;
+            gameLoop.GameRedraw += canvas.Redraw;
+            gameLoop.GameLooped += this.OnDrawCallback;
+            gameLoop.GameUpdate += this.OnUpdateCallback;
+
+            OnLoad();
+            Start();
 
             Application.Run(canvas);
         }
 
         private void StopLoop(object? sender, FormClosingEventArgs e)
         {
-            gameLoop.StopLoop();
+            gameLoop.Stop();
         }
+
+        public virtual void Stop()
+        {
+            gameLoop.Stop();
+        }
+
+        /// <summary>
+        /// Load whatever bullshit occurs before gameloop
+        /// Asset management, etc.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual void OnLoad()
+        {
+            Debug.WriteLine("OnLoad()");
+        }
+
+        public virtual void Start()
+        {
+            gameLoop.Start();
+        }
+
+        public virtual void OnDraw()
+        {
+            Debug.WriteLine("OnDraw()");
+        }
+
+        public virtual void OnUpdate()
+        {
+            Debug.WriteLine("OnUpdate()");
+        }
+
+        public void OnDrawCallback(object? sender, GameLoopedEventArgs e)
+        {
+            OnDraw();
+        }
+
+        public void OnUpdateCallback(object? sender, EventArgs e)
+        {
+            OnUpdate();
+        }
+    }
+
+    public interface IEngine
+    {
+        void Stop();
+        void OnLoad();
+        void Start();
+        void OnDraw();
+        void OnUpdate();
     }
 }

@@ -16,12 +16,12 @@ namespace GameEngineApp.Engine
             this.DoubleBuffered = true;
         }
 
-        public void RedrawCallback(object? sender, EventArgs e)
+        public void Redraw(object? sender, EventArgs e)
         {
             try
             {
+                Debug.WriteLine("Redraw callback in canvas.");
                 var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
-                //Debug.WriteLine("Refresh delegate result: "+result);
             } 
             catch
             {
@@ -38,7 +38,9 @@ namespace GameEngineApp.Engine
         {
             //Get graphics from paint event
             Graphics graphics = e.Graphics;
-            Debug.WriteLine(String.Format("Graphics drawn: {0}", e.ToString()));
+            graphics.Clear(Color.Black);
+            graphics.DrawRectangle(new Pen(Color.White),new Rectangle(new Point(32,32),new Size(32,32)));
+            Debug.WriteLine(String.Format("Graphics drawn in renderer: {0}", e.ToString()));
         }
     }
 
