@@ -10,7 +10,7 @@ namespace GameEngineApp.Engine
     {
         private GameEngine() : base() { }
 
-        public GameEngine(ScreenEng screen, string? title, IRenderer renderer, IGameLoop gameLoop)
+        public GameEngine(VectorTwo screen, string? title, IRenderer renderer, IGameLoop gameLoop)
             : base(screen, title, renderer, gameLoop) { }
     }
 }

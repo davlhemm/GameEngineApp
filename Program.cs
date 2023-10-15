@@ -9,7 +9,7 @@ namespace GameEngineApp
         public static void Main(string[] args)
         {
             GameEngine gameEngine = new GameEngine(
-                new ScreenEng(512,512), 
+                new VectorTwo(512,512), 
                 "Game Test", 
                 new Renderer(),
                 GameLoop.Instance);

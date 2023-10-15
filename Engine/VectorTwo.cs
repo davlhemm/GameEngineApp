@@ -6,32 +6,38 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
-    public class ScreenEng
+    public class VectorTwo : IVectorTwo<float>
     {
         public float X { get; set; }
         public float Y { get; set; }
 
-        public ScreenEng() 
+        public VectorTwo() 
         {
             X = 0;
             Y = 0;
         }
 
-        public ScreenEng(float x, float y)
+        public VectorTwo(float x, float y)
         {
             X = x;
             Y = y;
         }
 
-        public ScreenEng(int x, int y)
+        public VectorTwo(int x, int y)
         {
             X = x;
             Y = y;
         }
 
-        public static ScreenEng Zero()
+        public static VectorTwo Zero()
         {
-            return new ScreenEng();
+            return new VectorTwo();
         }
+    }
+
+    public interface IVectorTwo<T>
+    {
+        public T X { get; set; }
+        public T Y { get; set; }
     }
 }

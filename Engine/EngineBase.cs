@@ -10,7 +10,7 @@ namespace GameEngineApp.Engine
     public abstract class EngineBase : IEngine
     {
         //Include any base game/engine details
-        private ScreenEng screen = new ScreenEng(512,512);
+        private VectorTwo screen = new VectorTwo(512,512);
         private string? Title = "Base Title";
         private Canvas canvas = null!;
         private IRenderer renderer = null!;
@@ -18,7 +18,7 @@ namespace GameEngineApp.Engine
 
         protected EngineBase() { }
 
-        public EngineBase(ScreenEng screen, string? title, IRenderer renderer, IGameLoop gameLoop)
+        public EngineBase(VectorTwo screen, string? title, IRenderer renderer, IGameLoop gameLoop)
         {
             this.screen = screen;
             Title = title;
@@ -46,7 +46,7 @@ namespace GameEngineApp.Engine
 
         private void StopLoop(object? sender, FormClosingEventArgs e)
         {
-            gameLoop.Stop();
+            Stop();
         }
 
         public virtual void Stop()
