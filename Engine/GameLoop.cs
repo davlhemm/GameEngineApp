@@ -35,12 +35,14 @@ namespace GameEngineApp.Engine
             {
                 //Fire events for having looped
                 //OnDraw -> Refresh -> OnUpdate
+                //TODO: Change to static invocations or something...multicast delegates are slow
                 GameLooped?.Invoke(this, new GameLoopedEventArgs(LoopCount));
                 GameRedraw?.Invoke(this, new EventArgs());
                 GameUpdate?.Invoke(this, new EventArgs());
 
                 Debug.WriteLine(String.Format("Loop {0}", LoopCount));
                 LoopCount++;
+                //TODO: Is our delta time supposed to be dictated in its own system?!  Renderer does now
                 Thread.Sleep(10);
             }
         }
