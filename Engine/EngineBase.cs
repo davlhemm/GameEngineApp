@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +17,7 @@ namespace GameEngineApp.Engine
         private Canvas canvas = null!;
         private IRenderer renderer = null!;
         private IGameLoop gameLoop = null!;
+        public static List<Shape2D> shapes = new List<Shape2D>();
 
         protected EngineBase() { }
 
@@ -30,11 +33,11 @@ namespace GameEngineApp.Engine
             canvas.Text = title;
             //TODO: Intercept this renderer callback and let it know what to draw...
             //Consider static/global entity management?
-            canvas.Paint += renderer.Renderer;
+            canvas.Paint += Render;
             canvas.FormClosing += StopLoop;
             
             //Thread already active, just point the loop hooks to the right place
-            gameLoop.GameRedraw += canvas.Redraw;
+            gameLoop.GameRedraw += canvas.Refresh;
             gameLoop.GameLooped += this.OnDrawCallback;
             gameLoop.GameUpdate += this.OnUpdateCallback;
 
@@ -42,6 +45,11 @@ namespace GameEngineApp.Engine
             Start();
 
             Application.Run(canvas);
+        }
+
+        private void Render(object? sender, PaintEventArgs e)
+        {
+            renderer.Render(sender, e);
         }
 
         private void StopLoop(object? sender, FormClosingEventArgs e)
@@ -62,6 +70,11 @@ namespace GameEngineApp.Engine
         public virtual void OnLoad()
         {
             Debug.WriteLine("OnLoad()");
+            //New up a shape, registration already handled...
+            Shape2D aShape = new Shape2D(
+                new VectorTwo(16,16), 
+                new VectorTwo(16,16),
+                "Shape");
         }
 
         public virtual void Start()
@@ -76,7 +89,19 @@ namespace GameEngineApp.Engine
 
         public virtual void OnUpdate()
         {
-            Debug.WriteLine("OnUpdate()");
+            //Debug.WriteLine("OnUpdate()");
+            //TODO: Apply physics...update object locations
+            foreach(var shape in EngineBase.shapes)
+            {
+                //Move a percentage of X blocks downward until floor reached (screen height)
+                Debug.WriteLine("Y: "+shape.Position.Y);
+                Debug.WriteLine("Canvas Height: " + canvas.Size.Height);
+                //TODO: Figure out inconsistent wall boundary
+                if (shape.Position.Y < (canvas.Size.Height-shape.Scale.Y-64))
+                {
+                    shape.Position.Y += 3;
+                }
+            }
         }
 
         public void OnDrawCallback(object? sender, GameLoopedEventArgs e)
@@ -87,6 +112,16 @@ namespace GameEngineApp.Engine
         public void OnUpdateCallback(object? sender, EventArgs e)
         {
             OnUpdate();
+        }
+
+        public static void RegisterEntity(Shape2D shape)
+        {
+            shapes.Add(shape);
+        }
+
+        public static void UnregisterEntity(Shape2D shape)
+        {
+            shapes.Add(shape);
         }
     }
 

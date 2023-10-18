@@ -17,16 +17,16 @@ namespace GameEngineApp.Engine
             this.DoubleBuffered = true;
         }
 
-        public void Redraw(object? sender, EventArgs e)
+        public void Refresh(object? sender, EventArgs e)
         {
             try
             {
-                Debug.WriteLine("Redraw callback in canvas.");
+                //Debug.WriteLine("Refresh callback in canvas.");
                 var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
             } 
             catch
             {
-                Debug.WriteLine("Redraw fired while control doesn't exist.");
+                Debug.WriteLine("Refresh fired while control doesn't exist.");
             }
         }
     }
@@ -37,32 +37,53 @@ namespace GameEngineApp.Engine
     {
         public static int FramesRendered { get; set; } = 0;
         public static long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
+        //TODO: Move to gameloop, stupid to do here in renderer
+        public static TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
         public static TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
 
-        private static readonly Rectangle TestBox = new Rectangle(new Point(32, 32), new Size(32, 32));
+        //TODO: Manage entities, this is stupid
         private static readonly Pen TestPen = new Pen(Color.White, 8);
         private static readonly FontFamily TestFontFam = new FontFamily(GenericFontFamilies.Monospace);
         private static readonly Font TestFont = new Font(TestFontFam, 16.0f, FontStyle.Bold);
 
-        public void Renderer(object? sender, PaintEventArgs e)
+        public virtual void Render(object? sender, PaintEventArgs e)
         {
 
             //Get graphics from paint event
             Graphics graphics = e.Graphics;
-            graphics.Clear(Color.Black);
-            graphics.DrawRectangle(TestPen, TestBox);
+            if (true)//FramesRendered % 60 <= 30)
+            { 
+                graphics.Clear(Color.Black); 
+            }
+
+            //Draw all entities
+            DrawShapes(ref graphics);
+
             var currFrameTime = DateTime.Now.Ticks;
-            if (FramesRendered % 10 == 0)
+            DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
+            var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
+            if (FramesRendered % currFrameRate <= 5)
             {
-                var deltaTimeSpan = new TimeSpan(currFrameTime - PrevFrameTime);
-                FPSDeltaTime = deltaTimeSpan;
+                FPSDeltaTime = DeltaTime;
             }
             PrevFrameTime = currFrameTime;
             FramesRendered++;
+#if DEBUG
             DrawFPS(ref graphics, FPSDeltaTime);
+#endif
         }
 
-        static void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
+        private void DrawShapes(ref Graphics graphics)
+        {
+            foreach(var shape in GameEngine.shapes)
+            {
+                graphics.DrawRectangle(TestPen, 
+                    shape.Position.X, shape.Position.Y, 
+                    shape.Scale.X, shape.Scale.Y);
+            }
+        }
+
+        public void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
         {
             graphics.DrawString(((int)((1.0f / deltaTimeSpan.Milliseconds) * 1000.0f)).ToString() + "fps",
                 TestFont,
@@ -75,6 +96,6 @@ namespace GameEngineApp.Engine
     {
         public static int FramesRendered { get; set; }
         public static long PrevFrameTime { get; set; }
-        public void Renderer(object? sender, PaintEventArgs e);
+        public void Render(object? sender, PaintEventArgs e);
     }
 }

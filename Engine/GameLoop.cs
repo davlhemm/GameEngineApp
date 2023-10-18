@@ -43,7 +43,7 @@ namespace GameEngineApp.Engine
                 Debug.WriteLine(String.Format("Loop {0}", LoopCount));
                 LoopCount++;
                 //TODO: Is our delta time supposed to be dictated in its own system?!  Renderer does now
-                Thread.Sleep(10);
+                Thread.Sleep(16);
             }
         }
 
