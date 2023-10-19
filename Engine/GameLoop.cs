@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameEngineApp.Tools;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,6 +17,15 @@ namespace GameEngineApp.Engine
         public event EventHandler? GameUpdate;
 
         public Thread GameLoopThread { get; set; }
+
+
+        public int Frames { get; set; } = 0;
+        //TODO: Queue of previous timings? 1-N?
+        public long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
+        //TODO: Move to gameloop, stupid to do here in renderer
+        public TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
+        public TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
+
 
         private static readonly GameLoop instance = new GameLoop();
 
@@ -40,11 +50,29 @@ namespace GameEngineApp.Engine
                 GameRedraw?.Invoke(this, new EventArgs());
                 GameUpdate?.Invoke(this, new EventArgs());
 
-                Debug.WriteLine(String.Format("Loop {0}", LoopCount));
+                ComputeFrames();
+
+                Logger.Info(String.Format("Loop {0}", LoopCount));
                 LoopCount++;
                 //TODO: Is our delta time supposed to be dictated in its own system?!  Renderer does now
                 Thread.Sleep(16);
             }
+        }
+
+        private void ComputeFrames()
+        {
+            var currFrameTime = DateTime.Now.Ticks;
+            DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
+#if DEBUG //Only compute FPS for DEBUG
+            var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
+            if (Frames % currFrameRate <= 5)
+            {
+                FPSDeltaTime = DeltaTime;
+            }
+#endif
+            PrevFrameTime = currFrameTime;
+
+            Frames++;
         }
 
         public void Stop()

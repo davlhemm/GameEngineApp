@@ -35,14 +35,16 @@ namespace GameEngineApp.Engine
 
     public abstract class RendererBase : IRenderer
     {
-        public static int FramesRendered { get; set; } = 0;
-        public static long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
-        //TODO: Move to gameloop, stupid to do here in renderer
-        public static TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
-        public static TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
+        //public static int FramesRendered { get; set; } = 0;
+        ////TODO: Queue of previous timings? 1-N?
+        //public static long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
+        ////TODO: Move to gameloop, stupid to do here in renderer
+        //public static TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
+        //public static TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
 
         //TODO: Manage entities, this is stupid
         private static readonly Pen TestPen = new Pen(Color.White, 8);
+        private static readonly SolidBrush TestSolidBrush = new SolidBrush(Color.Cyan);
         private static readonly FontFamily TestFontFam = new FontFamily(GenericFontFamilies.Monospace);
         private static readonly Font TestFont = new Font(TestFontFam, 16.0f, FontStyle.Bold);
 
@@ -59,31 +61,36 @@ namespace GameEngineApp.Engine
             //Draw all entities
             DrawShapes(ref graphics);
 
-            var currFrameTime = DateTime.Now.Ticks;
-            DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
-            var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
-            if (FramesRendered % currFrameRate <= 5)
-            {
-                FPSDeltaTime = DeltaTime;
-            }
-            PrevFrameTime = currFrameTime;
-            FramesRendered++;
+            ComputeFrames();
 #if DEBUG
-            DrawFPS(ref graphics, FPSDeltaTime);
+            DrawFPS(ref graphics, GameLoop.Instance.FPSDeltaTime);
 #endif
         }
+        private void ComputeFrames()
+        {
+            //var currFrameTime = DateTime.Now.Ticks;
+            //DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
+            //var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
+            //if (FramesRendered % currFrameRate <= 5)
+            //{
+            //    FPSDeltaTime = DeltaTime;
+            //}
+            //PrevFrameTime = currFrameTime;
+            //FramesRendered++;
+        }
+
 
         private void DrawShapes(ref Graphics graphics)
         {
             foreach(var shape in GameEngine.shapes)
             {
-                graphics.DrawRectangle(TestPen, 
+                graphics.FillRectangle(TestSolidBrush, 
                     shape!.Position!.X, shape!.Position!.Y, 
                     shape!.Scale!.X, shape!.Scale!.Y);
             }
         }
 
-        public void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
+        private void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
         {
             graphics.DrawString(((int)((1.0f / deltaTimeSpan.Milliseconds) * 1000.0f)).ToString() + "fps",
                 TestFont,
