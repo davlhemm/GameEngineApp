@@ -8,7 +8,7 @@ namespace GameEngineApp.Engine
 {
     public abstract class Entity
     {
-        //Reference key for Dictionaries, etc.?
+        //Reference key for Dictionaries, etc.? GUID?
         public string Key { get; set; }
 
         protected Entity(string key) 

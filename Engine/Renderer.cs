@@ -78,8 +78,8 @@ namespace GameEngineApp.Engine
             foreach(var shape in GameEngine.shapes)
             {
                 graphics.DrawRectangle(TestPen, 
-                    shape.Position.X, shape.Position.Y, 
-                    shape.Scale.X, shape.Scale.Y);
+                    shape!.Position!.X, shape!.Position!.Y, 
+                    shape!.Scale!.X, shape!.Scale!.Y);
             }
         }
 

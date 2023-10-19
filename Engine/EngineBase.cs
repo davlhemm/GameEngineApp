@@ -14,7 +14,7 @@ namespace GameEngineApp.Engine
         //Include any base game/engine details
         private VectorTwo screen = new VectorTwo(512,512);
         private string? Title = "Base Title";
-        private Canvas canvas = null!;
+        protected Canvas canvas = null!;
         private IRenderer renderer = null!;
         private IGameLoop gameLoop = null!;
         public static List<Shape2D> shapes = new List<Shape2D>();
@@ -70,11 +70,6 @@ namespace GameEngineApp.Engine
         public virtual void OnLoad()
         {
             Debug.WriteLine("OnLoad()");
-            //New up a shape, registration already handled...
-            Shape2D aShape = new Shape2D(
-                new VectorTwo(16,16), 
-                new VectorTwo(16,16),
-                "Shape");
         }
 
         public virtual void Start()
@@ -89,19 +84,7 @@ namespace GameEngineApp.Engine
 
         public virtual void OnUpdate()
         {
-            //Debug.WriteLine("OnUpdate()");
-            //TODO: Apply physics...update object locations
-            foreach(var shape in EngineBase.shapes)
-            {
-                //Move a percentage of X blocks downward until floor reached (screen height)
-                Debug.WriteLine("Y: "+shape.Position.Y);
-                Debug.WriteLine("Canvas Height: " + canvas.Size.Height);
-                //TODO: Figure out inconsistent wall boundary
-                if (shape.Position.Y < (canvas.Size.Height-shape.Scale.Y-64))
-                {
-                    shape.Position.Y += 3;
-                }
-            }
+            Debug.WriteLine("OnUpdate()");
         }
 
         public void OnDrawCallback(object? sender, GameLoopedEventArgs e)
@@ -121,7 +104,7 @@ namespace GameEngineApp.Engine
 
         public static void UnregisterEntity(Shape2D shape)
         {
-            shapes.Add(shape);
+            shapes.Remove(shape);
         }
     }
 
