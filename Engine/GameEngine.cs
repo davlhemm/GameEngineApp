@@ -26,7 +26,7 @@ namespace GameEngineApp.Engine
         public override void OnUpdate()
         {
             //TODO: Apply physics...update object locations
-            foreach (var shape in EngineBase.shapes)
+            foreach (var shape in EngineBase._shapes)
             {
                 //Move a percentage of X blocks downward until floor reached (screen height)
                 Debug.WriteLine("Y: " + shape?.Position?.Y);
@@ -34,7 +34,8 @@ namespace GameEngineApp.Engine
                 //TODO: Figure out inconsistent wall boundary
                 if ((shape?.Position?.Y + 2 * shape?.Scale?.Y) < (canvas.Size.Height - 2 * shape?.Scale?.Y))
                 {
-                    shape!.Position!.Y += 5;
+                    //TODO: Gravity, speed(s), direction(s)
+                    shape!.Position!.Y += GameLoop.Instance.DeltaTime.Milliseconds/10;
                 }
             }
         }

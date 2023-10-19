@@ -15,9 +15,9 @@ namespace GameEngineApp.Engine
         private VectorTwo screen = new VectorTwo(512,512);
         private string? Title = "Base Title";
         protected Canvas canvas = null!;
-        private IRenderer renderer = null!;
-        private IGameLoop gameLoop = null!;
-        public static List<Shape2D> shapes = new List<Shape2D>();
+        private IRenderer _renderer = null!;
+        private IGameLoop _gameLoop = null!;
+        public static List<Shape2D> _shapes = new List<Shape2D>();
 
         protected EngineBase() { }
 
@@ -25,8 +25,8 @@ namespace GameEngineApp.Engine
         {
             this.screen = screen;
             Title = title;
-            this.renderer = renderer;
-            this.gameLoop = gameLoop;
+            this._renderer = renderer;
+            this._gameLoop = gameLoop;
 
             canvas = new Canvas();
             canvas.Size = new Size((int)screen.X, (int)screen.Y);
@@ -49,7 +49,7 @@ namespace GameEngineApp.Engine
 
         private void Render(object? sender, PaintEventArgs e)
         {
-            renderer.Render(sender, e);
+            _renderer.Render(sender, e);
         }
 
         private void StopLoop(object? sender, FormClosingEventArgs e)
@@ -59,7 +59,7 @@ namespace GameEngineApp.Engine
 
         public virtual void Stop()
         {
-            gameLoop.Stop();
+            _gameLoop.Stop();
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace GameEngineApp.Engine
 
         public virtual void Start()
         {
-            gameLoop.Start();
+            _gameLoop.Start();
         }
 
         public virtual void OnDraw()
@@ -99,12 +99,12 @@ namespace GameEngineApp.Engine
 
         public static void RegisterEntity(Shape2D shape)
         {
-            shapes.Add(shape);
+            _shapes.Add(shape);
         }
 
         public static void UnregisterEntity(Shape2D shape)
         {
-            shapes.Remove(shape);
+            _shapes.Remove(shape);
         }
     }
 

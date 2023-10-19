@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
-    public sealed class GameLoop : IGameLoop
+    public class GameLoop : IGameLoop
     {
         public static int LoopCount = 0;
         public static bool GameLooping = false;
+        public static float FrameRate = 60.0f; //Frames/1000ms
         public event EventHandler<GameLoopedEventArgs>? GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;
@@ -22,7 +23,6 @@ namespace GameEngineApp.Engine
         public int Frames { get; set; } = 0;
         //TODO: Queue of previous timings? 1-N?
         public long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
-        //TODO: Move to gameloop, stupid to do here in renderer
         public TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
         public TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
 
@@ -43,6 +43,8 @@ namespace GameEngineApp.Engine
         {
             while (GameLooping && GameLoopThread.IsAlive)
             {
+                ComputeFrames();
+
                 //Fire events for having looped
                 //OnDraw -> Refresh -> OnUpdate
                 //TODO: Change to static invocations or something...multicast delegates are slow
@@ -50,13 +52,25 @@ namespace GameEngineApp.Engine
                 GameRedraw?.Invoke(this, new EventArgs());
                 GameUpdate?.Invoke(this, new EventArgs());
 
-                ComputeFrames();
-
-                Logger.Info(String.Format("Loop {0}", LoopCount));
                 LoopCount++;
-                //TODO: Is our delta time supposed to be dictated in its own system?!  Renderer does now
-                Thread.Sleep(16);
+
+                Log();
+
+                Sleep();
             }
+        }
+
+        private void Log()
+        {
+            Logger.Info(String.Format("Loop {0}", LoopCount));
+        }
+
+        public virtual void Sleep()
+        { 
+            var frameDensityMultiplier = 0.75f;
+            float frameSleepTotal = 1000f / FrameRate * frameDensityMultiplier;
+            float neededSleep = Math.Max(frameSleepTotal - DeltaTime.Milliseconds, 0);
+            Thread.Sleep((int)(frameSleepTotal - neededSleep));
         }
 
         private void ComputeFrames()
@@ -65,10 +79,11 @@ namespace GameEngineApp.Engine
             DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
 #if DEBUG //Only compute FPS for DEBUG
             var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
-            if (Frames % currFrameRate <= 5)
+            if (Frames % FrameRate == 0)
             {
                 FPSDeltaTime = DeltaTime;
             }
+            Debug.WriteLine("DeltaTime in ms: " + DeltaTime.Milliseconds);
 #endif
             PrevFrameTime = currFrameTime;
 
@@ -95,6 +110,7 @@ namespace GameEngineApp.Engine
         void Loop();
         void Stop();
         void Start();
+        void Sleep();
         public event EventHandler<GameLoopedEventArgs> GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;

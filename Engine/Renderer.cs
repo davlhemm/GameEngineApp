@@ -60,29 +60,14 @@ namespace GameEngineApp.Engine
 
             //Draw all entities
             DrawShapes(ref graphics);
-
-            ComputeFrames();
-#if DEBUG
+#if DEBUG   //Draw FPS if debugging
             DrawFPS(ref graphics, GameLoop.Instance.FPSDeltaTime);
 #endif
         }
-        private void ComputeFrames()
-        {
-            //var currFrameTime = DateTime.Now.Ticks;
-            //DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
-            //var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
-            //if (FramesRendered % currFrameRate <= 5)
-            //{
-            //    FPSDeltaTime = DeltaTime;
-            //}
-            //PrevFrameTime = currFrameTime;
-            //FramesRendered++;
-        }
-
 
         private void DrawShapes(ref Graphics graphics)
         {
-            foreach(var shape in GameEngine.shapes)
+            foreach(var shape in GameEngine._shapes)
             {
                 graphics.FillRectangle(TestSolidBrush, 
                     shape!.Position!.X, shape!.Position!.Y, 
@@ -92,10 +77,11 @@ namespace GameEngineApp.Engine
 
         private void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
         {
+            var rightBound = graphics.ClipBounds.Right;
             graphics.DrawString(((int)((1.0f / deltaTimeSpan.Milliseconds) * 1000.0f)).ToString() + "fps",
                 TestFont,
                 new SolidBrush(Color.Blue),
-                new PointF(420.0f, 0.0f));
+                new PointF(rightBound-32f, 0.0f));
         }
     }
 
