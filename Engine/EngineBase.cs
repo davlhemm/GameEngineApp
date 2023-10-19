@@ -15,8 +15,8 @@ namespace GameEngineApp.Engine
         private VectorTwo screen = new VectorTwo(512,512);
         private string? Title = "Base Title";
         protected Canvas canvas = null!;
-        private IRenderer _renderer = null!;
-        private IGameLoop _gameLoop = null!;
+        protected IRenderer _renderer = null!;
+        protected IGameLoop _gameLoop = null!;
         public static List<Shape2D> _shapes = new List<Shape2D>();
 
         protected EngineBase() { }
@@ -106,6 +106,11 @@ namespace GameEngineApp.Engine
         {
             _shapes.Remove(shape);
         }
+
+        public void SetFramerate(float framerate)
+        {
+            _gameLoop.SetFrameRate(framerate);
+        }
     }
 
     public interface IEngine
@@ -115,5 +120,6 @@ namespace GameEngineApp.Engine
         void Start();
         void OnDraw();
         void OnUpdate();
+        void SetFramerate(float framerate);
     }
 }

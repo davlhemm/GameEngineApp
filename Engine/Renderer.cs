@@ -78,10 +78,11 @@ namespace GameEngineApp.Engine
         private void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
         {
             var rightBound = graphics.ClipBounds.Right;
-            graphics.DrawString(((int)((1.0f / deltaTimeSpan.Milliseconds) * 1000.0f)).ToString() + "fps",
+            var dataString = ((int)((1.0f / deltaTimeSpan.Milliseconds) * 1000.0f)).ToString() + "fps";
+            graphics.DrawString(dataString,
                 TestFont,
                 new SolidBrush(Color.Blue),
-                new PointF(rightBound-32f, 0.0f));
+                new PointF(rightBound-(dataString.Length*16f), 0.0f));
         }
     }
 

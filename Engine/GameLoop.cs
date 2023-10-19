@@ -13,6 +13,7 @@ namespace GameEngineApp.Engine
         public static int LoopCount = 0;
         public static bool GameLooping = false;
         public static float FrameRate = 60.0f; //Frames/1000ms
+        public static float FrameDensityDiff = 2.5f; // BS Constant to review later
         public event EventHandler<GameLoopedEventArgs>? GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;
@@ -67,8 +68,7 @@ namespace GameEngineApp.Engine
 
         public virtual void Sleep()
         { 
-            var frameDensityMultiplier = 0.75f;
-            float frameSleepTotal = 1000f / FrameRate * frameDensityMultiplier;
+            float frameSleepTotal = (1000f / FrameRate) - FrameDensityDiff;
             float neededSleep = Math.Max(frameSleepTotal - DeltaTime.Milliseconds, 0);
             Thread.Sleep((int)(frameSleepTotal - neededSleep));
         }
@@ -78,8 +78,9 @@ namespace GameEngineApp.Engine
             var currFrameTime = DateTime.Now.Ticks;
             DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
 #if DEBUG //Only compute FPS for DEBUG
-            var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
-            if (Frames % FrameRate == 0)
+            //var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
+            var FpsUpdateRate = 5f;
+            if ((Frames%(FrameRate/FpsUpdateRate)) == 0)
             {
                 FPSDeltaTime = DeltaTime;
             }
@@ -102,6 +103,11 @@ namespace GameEngineApp.Engine
             GameLooping = true;
             GameLoopThread.Start(); 
         }
+
+        public void SetFrameRate(float frameRate)
+        {
+            FrameRate = frameRate;
+        }
     }
 
     public interface IGameLoop
@@ -111,6 +117,7 @@ namespace GameEngineApp.Engine
         void Stop();
         void Start();
         void Sleep();
+        void SetFrameRate(float frameRate);
         public event EventHandler<GameLoopedEventArgs> GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;
