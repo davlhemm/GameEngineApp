@@ -25,6 +25,7 @@ namespace GameEngineApp.Engine
         //TODO: Queue of previous timings? 1-N?
         public long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
         public TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
+        //TODO: Use more accurate method of delta-time, info being lost w/long instead of float here
         public TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
 
 
@@ -42,6 +43,11 @@ namespace GameEngineApp.Engine
 
         public void Loop()
         {
+            //TODO: Decouple our actual rendering invocations from game/physics updates.
+            /// We want these to be able to act independently in case calculations
+            /// require several passes before frame actually rendered.
+            /// Will allow frame independence for between-frame calcs.
+            /// Frame boundaries defined by what system?!
             while (GameLooping && GameLoopThread.IsAlive)
             {
                 ComputeFrames();
@@ -64,6 +70,7 @@ namespace GameEngineApp.Engine
         private void Log()
         {
             Logger.Info(String.Format("Loop {0}", LoopCount));
+            Logger.WhatThread("GameLoop");
         }
 
         public virtual void Sleep()

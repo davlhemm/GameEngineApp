@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GameEngineApp.Tools;
+using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -12,9 +14,9 @@ namespace GameEngineApp.Engine
     public abstract class EngineBase : IEngine
     {
         //Include any base game/engine details
-        private VectorTwo screen = new VectorTwo(512,512);
-        private string? Title = "Base Title";
-        protected Canvas canvas = null!;
+        protected VectorTwo _screen = new VectorTwo(512,512);
+        protected string? _title = "Base Title";
+        protected Canvas _canvas = null!;
         protected IRenderer _renderer = null!;
         protected IGameLoop _gameLoop = null!;
         public static List<Shape2D> _shapes = new List<Shape2D>();
@@ -23,28 +25,49 @@ namespace GameEngineApp.Engine
 
         public EngineBase(VectorTwo screen, string? title, IRenderer renderer, IGameLoop gameLoop)
         {
-            this.screen = screen;
-            Title = title;
-            this._renderer = renderer;
-            this._gameLoop = gameLoop;
+            _screen     = screen;
+            _title      = title;
+            _renderer   = renderer;
+            _gameLoop   = gameLoop;
 
-            canvas = new Canvas();
-            canvas.Size = new Size((int)screen.X, (int)screen.Y);
-            canvas.Text = title;
+            _canvas = new Canvas();
+            _canvas.Size = new Size((int)screen.X, (int)screen.Y);
+            _canvas.Text = title;
             //TODO: Intercept this renderer callback and let it know what to draw...
             //Consider static/global entity management?
-            canvas.Paint += Render;
-            canvas.FormClosing += StopLoop;
-            
+            _canvas.Paint += Render;
+            _canvas.FormClosing += StopLoop;
+            _canvas.KeyDown += KeyDownCallback;
+            _canvas.KeyUp   += KeyUpCallback;
+            _canvas.MouseMove += MouseMoveCallback;
+
             //Thread already active, just point the loop hooks to the right place
-            gameLoop.GameRedraw += canvas.Refresh;
-            gameLoop.GameLooped += this.OnDrawCallback;
-            gameLoop.GameUpdate += this.OnUpdateCallback;
+            gameLoop.GameRedraw += _canvas.Refresh;
+            gameLoop.GameLooped += OnDrawCallback;
+            gameLoop.GameUpdate += OnUpdateCallback;
 
             OnLoad();
             Start();
 
-            Application.Run(canvas);
+            Application.Run(_canvas);
+        }
+
+        private void MouseMoveCallback(object? sender, MouseEventArgs e)
+        {
+            Debug.WriteLine("Mouse Location: " + e.Location);
+            Logger.WhatThread("MouseMoveCallback");
+        }
+
+        private void KeyDownCallback(object? sender, KeyEventArgs e)
+        {
+            Debug.WriteLine("Key Down: " + e.KeyData);
+            Logger.WhatThread("KeyDownCallback");
+        }
+
+        private void KeyUpCallback(object? sender, KeyEventArgs e)
+        {
+            Debug.WriteLine("Key Up: "+e.KeyData);
+            Logger.WhatThread("KeyUpCallback");
         }
 
         private void Render(object? sender, PaintEventArgs e)
@@ -120,6 +143,6 @@ namespace GameEngineApp.Engine
         void Start();
         void OnDraw();
         void OnUpdate();
-        void SetFramerate(float framerate);
+        void SetFramerate(float framerate); 
     }
 }

@@ -21,7 +21,7 @@ namespace GameEngineApp.Engine
                 new VectorTwo(16, 16),
                 new VectorTwo(16, 16),
                 "Shape");
-            SetFramerate(120f);
+            SetFramerate(60f);
         }
 
         public override void OnUpdate()
@@ -32,10 +32,16 @@ namespace GameEngineApp.Engine
             {
                 //Move a percentage of X blocks downward until floor reached (screen height)
                 //TODO: Figure out inconsistent wall boundary
-                if ((shape?.Position?.Y + 2 * shape?.Scale?.Y) < (canvas.Size.Height - 2 * shape?.Scale?.Y))
+                if ((shape?.Position?.Y + 2 * shape?.Scale?.Y) < (_canvas.Size.Height - 2 * shape?.Scale?.Y))
                 {
                     //TODO: Gravity, speed(s), direction(s)
-                    shape!.Position!.Y += GameLoop.Instance.DeltaTime.Milliseconds;
+                    shape!.Position!.Y += 0.1f*(float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                }
+                else
+                {
+                    Debug.WriteLine("End simulation time: " +
+                        (GameLoop.Instance.Frames / GameLoop.FrameRate) + " seconds");
+                    //Application.Exit();
                 }
             }
         }

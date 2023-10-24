@@ -13,5 +13,10 @@ namespace GameEngineApp.Tools
         {
             Debug.WriteLine(message);
         }
+
+        public static void WhatThread(string callee = "callee")
+        {
+            Debug.WriteLine(String.Format("Thread used by {0}: {1}",callee,Thread.CurrentThread.ManagedThreadId));
+        }
     }
 }

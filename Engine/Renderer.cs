@@ -17,12 +17,18 @@ namespace GameEngineApp.Engine
             this.DoubleBuffered = true;
         }
 
+        public override void Refresh()
+        {
+            base.Refresh();
+        }
+
         public void Refresh(object? sender, EventArgs e)
         {
             try
             {
                 //Debug.WriteLine("Refresh callback in canvas.");
                 var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
+                //Refresh();
             } 
             catch
             {
@@ -50,7 +56,6 @@ namespace GameEngineApp.Engine
 
         public virtual void Render(object? sender, PaintEventArgs e)
         {
-
             //Get graphics from paint event
             Graphics graphics = e.Graphics;
             if (true)//FramesRendered % 60 <= 30)
