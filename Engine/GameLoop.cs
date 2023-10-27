@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
+    public delegate void SomeDelegateCallback();
+
     public class GameLoop : IGameLoop
     {
         public static int LoopCount = 0;
@@ -17,6 +19,8 @@ namespace GameEngineApp.Engine
         public event EventHandler<GameLoopedEventArgs>? GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;
+        public SomeDelegateCallback DelegateCallback { get; set; }
+
 
         public Thread GameLoopThread { get; set; }
 
@@ -38,7 +42,13 @@ namespace GameEngineApp.Engine
 
         private GameLoop() 
         {
+            DelegateCallback = DefaultCallback;
             GameLoopThread = new Thread(Loop);
+        }
+
+        private void DefaultCallback()
+        {
+            Logger.Info("Default Callback in Loop");
         }
 
         public void Loop()
@@ -59,6 +69,10 @@ namespace GameEngineApp.Engine
                 GameRedraw?.Invoke(this, new EventArgs());
                 GameUpdate?.Invoke(this, new EventArgs());
 
+#if DEBUG
+                DelegateCallback.Invoke();
+#endif
+
                 LoopCount++;
 
                 Log();
@@ -67,7 +81,7 @@ namespace GameEngineApp.Engine
             }
         }
 
-        private void Log()
+        public void Log()
         {
             Logger.Info(String.Format("Loop {0}", LoopCount));
             Logger.WhatThread("GameLoop");
@@ -124,10 +138,12 @@ namespace GameEngineApp.Engine
         void Stop();
         void Start();
         void Sleep();
+        void Log();
         void SetFrameRate(float frameRate);
         public event EventHandler<GameLoopedEventArgs> GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;
+        SomeDelegateCallback DelegateCallback { get; set; }
     }
 
     public class GameLoopedEventArgs : EventArgs 

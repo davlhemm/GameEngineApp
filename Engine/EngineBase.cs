@@ -45,11 +45,20 @@ namespace GameEngineApp.Engine
             gameLoop.GameRedraw += _canvas.Refresh;
             gameLoop.GameLooped += OnDrawCallback;
             gameLoop.GameUpdate += OnUpdateCallback;
+            gameLoop.DelegateCallback += DelegateStuff;
+            gameLoop.DelegateCallback += gameLoop.Log;
 
             OnLoad();
             Start();
 
+            //gameLoop.DelegateCallback.Invoke();
+
             Application.Run(_canvas);
+        }
+
+        private void DelegateStuff()
+        {
+            Logger.Info("Delegate Ran in Engine, triggered from invocation.");
         }
 
         private void MouseMoveCallback(object? sender, MouseEventArgs e)

@@ -72,7 +72,7 @@ namespace GameEngineApp.Engine
 
         private void DrawShapes(ref Graphics graphics)
         {
-            foreach(var shape in GameEngine._shapes)
+            foreach(var shape in EngineBase._shapes)
             {
                 graphics.FillRectangle(TestSolidBrush, 
                     shape!.Position!.X, shape!.Position!.Y, 
