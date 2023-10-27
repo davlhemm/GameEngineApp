@@ -9,6 +9,9 @@ namespace GameEngineApp.Engine
 {
     public class GameEngine : EngineBase
     {
+        Shape2D player = null!;
+        float playerSpeed = 0.2f;
+
         private GameEngine() : base() { }
 
         public GameEngine(VectorTwo screen, string? title, IRenderer renderer, IGameLoop gameLoop)
@@ -21,11 +24,39 @@ namespace GameEngineApp.Engine
                 new VectorTwo(16, 16),
                 new VectorTwo(16, 16),
                 "Shape");
-            SetFramerate(60f);
+            player = new Shape2D(
+                new VectorTwo(64, 16),
+                new VectorTwo(16, 16),
+                "Player");
+            SetFramerate(240f);
         }
 
         public override void OnUpdate()
         {
+            if(player != null)
+            {
+
+                if(inputManager != null)
+                {
+                    if (inputManager.up)
+                    {
+                        player!.Position!.Y -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                    }
+                    if (inputManager.down)
+                    {
+                        player!.Position!.Y += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                    }
+                    if (inputManager.left)
+                    {
+                        player!.Position!.X -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                    }
+                    if (inputManager.right)
+                    {
+                        player!.Position!.X += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                    }
+                }
+            }
+
             //TODO: deltaTime/2 trick for frame-rate independent update consistency
             //TODO: Apply physics...update object locations
             foreach (var shape in EngineBase._shapes)

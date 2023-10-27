@@ -70,7 +70,7 @@ namespace GameEngineApp.Engine
                 GameUpdate?.Invoke(this, new EventArgs());
 
 #if DEBUG
-                DelegateCallback.Invoke();
+                //DelegateCallback.Invoke();
 #endif
 
                 LoopCount++;

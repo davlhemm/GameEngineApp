@@ -16,7 +16,7 @@ namespace GameEngineApp.Tools
 
         public static void WhatThread(string callee = "callee")
         {
-            Debug.WriteLine(String.Format("Thread used by {0}: {1}",
+            Debug.WriteLine(String.Format("{0} Thread: {1}",
                 callee,
                 Thread.CurrentThread.ManagedThreadId));
         }

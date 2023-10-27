@@ -19,6 +19,7 @@ namespace GameEngineApp.Engine
         protected Canvas _canvas = null!;
         protected IRenderer _renderer = null!;
         protected IGameLoop _gameLoop = null!;
+        protected IInputManager inputManager = null!;
         public static List<Shape2D> _shapes = new List<Shape2D>();
 
         protected EngineBase() { }
@@ -37,16 +38,17 @@ namespace GameEngineApp.Engine
             //Consider static/global entity management?
             _canvas.Paint += Render;
             _canvas.FormClosing += StopLoop;
-            _canvas.KeyDown += KeyDownCallback;
-            _canvas.KeyUp   += KeyUpCallback;
-            _canvas.MouseMove += MouseMoveCallback;
+            //_canvas.KeyDown += KeyDownCallback;
+            //_canvas.KeyUp   += KeyUpCallback;
+            //_canvas.MouseMove += MouseMoveCallback;
+            inputManager = new InputManager(ref _canvas);
 
             //Thread already active, just point the loop hooks to the right place
             gameLoop.GameRedraw += _canvas.Refresh;
             gameLoop.GameLooped += OnDrawCallback;
             gameLoop.GameUpdate += OnUpdateCallback;
-            gameLoop.DelegateCallback += DelegateStuff;
-            gameLoop.DelegateCallback += gameLoop.Log;
+            //gameLoop.DelegateCallback += DelegateStuff;
+            //gameLoop.DelegateCallback += gameLoop.Log;
 
             OnLoad();
             Start();
@@ -59,24 +61,6 @@ namespace GameEngineApp.Engine
         private void DelegateStuff()
         {
             Logger.Info("Delegate Ran in Engine, triggered from invocation.");
-        }
-
-        private void MouseMoveCallback(object? sender, MouseEventArgs e)
-        {
-            Debug.WriteLine("Mouse Location: " + e.Location);
-            Logger.WhatThread("MouseMoveCallback");
-        }
-
-        private void KeyDownCallback(object? sender, KeyEventArgs e)
-        {
-            Debug.WriteLine("Key Down: " + e.KeyData);
-            Logger.WhatThread("KeyDownCallback");
-        }
-
-        private void KeyUpCallback(object? sender, KeyEventArgs e)
-        {
-            Debug.WriteLine("Key Up: "+e.KeyData);
-            Logger.WhatThread("KeyUpCallback");
         }
 
         private void Render(object? sender, PaintEventArgs e)
