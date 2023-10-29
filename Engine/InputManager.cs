@@ -10,13 +10,15 @@ namespace GameEngineApp.Engine
 {
     public class InputManager : IInputManager
     {
-        public bool up {  get; set; }
+        public bool Up {  get; set; }
 
-        public bool down { get; set; }
+        public bool Down { get; set; }
 
-        public bool left { get; set; }
+        public bool Left { get; set; }
 
-        public bool right { get; set; }
+        public bool Right { get; set; }
+
+        public bool Escape { get; set; }
 
         public InputManager(ref Canvas canvas) 
         {
@@ -48,20 +50,23 @@ namespace GameEngineApp.Engine
         //TODO: Dict/HashMap of key input(s) to action(s)
         public void KeyMap(KeyEventArgs e, bool setTo)
         {
-            Keys flagUp = Keys.Up | Keys.W;
+            //Keys flagUp = Keys.Up | Keys.W;
             switch (e.KeyData)
             {
                 case Keys.Up:
-                    up = setTo;
+                    Up = setTo;
                     break;
                 case Keys.Down:
-                    down = setTo;
+                    Down = setTo;
                     break;
                 case Keys.Left:
-                    left = setTo;
+                    Left = setTo;
                     break;
                 case Keys.Right:
-                    right = setTo;
+                    Right = setTo;
+                    break;
+                case Keys.Escape: 
+                    Escape = setTo;
                     break;
             }
         }
@@ -69,10 +74,11 @@ namespace GameEngineApp.Engine
 
     public interface IInputManager
     {
-        bool up { get; } 
-        bool down { get; }
-        bool left { get; }
-        bool right { get; }
+        bool Up { get; } 
+        bool Down { get; }
+        bool Left { get; }
+        bool Right { get; }
+        bool Escape { get; }
         void KeyDown(object? sender, KeyEventArgs e);
         void KeyUp(object? sender, KeyEventArgs e);
         void MouseMove(object? sender, MouseEventArgs e);

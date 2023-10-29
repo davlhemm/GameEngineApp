@@ -1,5 +1,7 @@
-﻿using System;
+﻿using GameEngineApp.Tools;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,7 @@ namespace GameEngineApp.Engine
     {
         Shape2D player = null!;
         float playerSpeed = 0.2f;
+        Map map = new Map();
 
         private GameEngine() : base() { }
 
@@ -28,29 +31,43 @@ namespace GameEngineApp.Engine
                 new VectorTwo(64, 16),
                 new VectorTwo(16, 16),
                 "Player");
-            SetFramerate(240f);
+            int mapChunkWidth = 32, mapChunkHeight = 32;
+            for(int i = 0; i < map.Tiles.GetLength(0); i++)
+            {
+                for(int j = 0; j < map.Tiles.GetLength(1); j++)
+                {
+                    if (map.Tiles[i,j] != "")
+                    {
+                        new Shape2D(
+                            new VectorTwo(mapChunkWidth * j, mapChunkHeight * i),
+                            new VectorTwo(mapChunkWidth, mapChunkHeight), 
+                            "Map");
+                    }
+                    Logger.Info(String.Format("Map tile at [{1},{2}]: {0}", map.Tiles[i,j],i,j));
+                }
+            }
+            SetFramerate(100f);
         }
 
         public override void OnUpdate()
         {
             if(player != null)
             {
-
                 if(inputManager != null)
                 {
-                    if (inputManager.up)
+                    if (inputManager.Up)
                     {
                         player!.Position!.Y -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
-                    if (inputManager.down)
+                    if (inputManager.Down)
                     {
                         player!.Position!.Y += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
-                    if (inputManager.left)
+                    if (inputManager.Left)
                     {
                         player!.Position!.X -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
-                    if (inputManager.right)
+                    if (inputManager.Right)
                     {
                         player!.Position!.X += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
@@ -66,12 +83,15 @@ namespace GameEngineApp.Engine
                 if ((shape?.Position?.Y + 2 * shape?.Scale?.Y) < (_canvas.Size.Height - 2 * shape?.Scale?.Y))
                 {
                     //TODO: Gravity, speed(s), direction(s)
-                    shape!.Position!.Y += 0.1f*(float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                    if(shape?.Key != "Map")
+                    {
+                        shape!.Position!.Y += 0.1f * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+                    }
                 }
                 else
                 {
-                    Debug.WriteLine("End simulation time: " +
-                        (GameLoop.Instance.Frames / GameLoop.FrameRate) + " seconds");
+                    //Debug.WriteLine("End simulation time: " +
+                    //    (GameLoop.Instance.Frames / GameLoop.FrameRate) + " seconds");
                     //Application.Exit();
                 }
             }
