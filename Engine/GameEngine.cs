@@ -49,6 +49,10 @@ namespace GameEngineApp.Engine
             SetFramerate(100f);
         }
 
+        /// <summary>
+        /// Run any update needed based on deltaTime
+        /// TODO: Entity Component System for composition update(s) instead of piecemeal here...
+        /// </summary>
         public override void OnUpdate()
         {
             if(player != null)

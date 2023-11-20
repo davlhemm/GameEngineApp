@@ -41,15 +41,9 @@ namespace GameEngineApp.Engine
 
     public abstract class RendererBase : IRenderer
     {
-        //public static int FramesRendered { get; set; } = 0;
-        ////TODO: Queue of previous timings? 1-N?
-        //public static long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
-        ////TODO: Move to gameloop, stupid to do here in renderer
-        //public static TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
-        //public static TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
+        //TODO: Manage with entity-component-system, this is stupid
 
-        //TODO: Manage entities, this is stupid
-        private static readonly Pen TestPen = new Pen(Color.White, 8);
+        //private static readonly Pen TestPen = new Pen(Color.White, 8);
         private static readonly SolidBrush TestSolidBrush = new SolidBrush(Color.Cyan);
         private static readonly FontFamily TestFontFam = new FontFamily(GenericFontFamilies.Monospace);
         private static readonly Font TestFont = new Font(TestFontFam, 16.0f, FontStyle.Bold);
@@ -58,7 +52,7 @@ namespace GameEngineApp.Engine
         {
             //Get graphics from paint event
             Graphics graphics = e.Graphics;
-            if (true)//FramesRendered % 60 <= 30)
+            if (true)
             { 
                 graphics.Clear(Color.Black); 
             }
@@ -93,8 +87,6 @@ namespace GameEngineApp.Engine
 
     public interface IRenderer
     {
-        public static int FramesRendered { get; set; }
-        public static long PrevFrameTime { get; set; }
         public void Render(object? sender, PaintEventArgs e);
     }
 }

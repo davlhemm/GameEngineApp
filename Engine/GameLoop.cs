@@ -31,6 +31,8 @@ namespace GameEngineApp.Engine
         public TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
         //TODO: Use more accurate method of delta-time, info being lost w/long instead of float here
         public TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
+        ////TODO: Queue of previous timings? 1-N?
+        //public static long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
 
 
         private static readonly GameLoop instance = new GameLoop();
@@ -143,7 +145,7 @@ namespace GameEngineApp.Engine
         public event EventHandler<GameLoopedEventArgs> GameLooped;
         public event EventHandler? GameRedraw;
         public event EventHandler? GameUpdate;
-        SomeDelegateCallback DelegateCallback { get; set; }
+        public SomeDelegateCallback DelegateCallback { get; set; }
     }
 
     public class GameLoopedEventArgs : EventArgs 
