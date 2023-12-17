@@ -1,0 +1,8 @@
+Game(s)
+
+Fighter
+	Projectile-based
+		Complex interactions
+		Durability revamp
+		Elements/states
+	Full 2D
