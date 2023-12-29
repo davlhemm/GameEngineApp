@@ -16,9 +16,11 @@ namespace GameEngineApp.Tools
 
         public static void WhatThread(string callee = "callee")
         {
+#if DEBUG
             Debug.WriteLine(String.Format("{0} Thread: {1}",
                 callee,
                 Thread.CurrentThread.ManagedThreadId));
+#endif
         }
     }
 }

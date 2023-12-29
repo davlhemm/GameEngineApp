@@ -22,12 +22,21 @@ namespace GameEngineApp.Engine
             base.Refresh();
         }
 
-        public void Refresh(object? sender, EventArgs e)
+        /// <summary>
+        /// TODO: Send a timestep or something to indicate whether we need to actually call draw...
+        /// going to default here to a step
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Refresh(object? sender, DrawFrameEventArgs e)
         {
             try
             {
                 //Debug.WriteLine("Refresh callback in canvas.");
-                var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
+                if(e.DrawFrame)
+                {
+                    var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
+                }
                 //Refresh();
             } 
             catch

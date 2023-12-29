@@ -13,11 +13,13 @@ namespace GameEngineApp.Engine
     public class GameLoop : IGameLoop
     {
         public static int LoopCount = 0;
+        //TODO: DI of FrameRate info struct here
         public static bool GameLooping = false;
+        public static float FrameRateSkip = 2;
         public static float FrameRate = 60.0f; //Frames/1000ms
         public static float FrameDensityDiff = 2.5f; // BS Constant to review later
         public event EventHandler<GameLoopedEventArgs>? GameLooped;
-        public event EventHandler? GameRedraw;
+        public event EventHandler<DrawFrameEventArgs>? GameRedraw;
         public event EventHandler? GameUpdate;
         public SomeDelegateCallback DelegateCallback { get; set; }
 
@@ -68,7 +70,8 @@ namespace GameEngineApp.Engine
                 //OnDraw -> Refresh -> OnUpdate
                 //TODO: Change to static invocations or something...multicast delegates are slow
                 GameLooped?.Invoke(this, new GameLoopedEventArgs(LoopCount));
-                GameRedraw?.Invoke(this, new EventArgs());
+                var drawThisFrame = LoopCount % FrameRateSkip == 0;
+                GameRedraw?.Invoke(this, new DrawFrameEventArgs(drawThisFrame));
                 GameUpdate?.Invoke(this, new EventArgs());
 
 #if DEBUG
@@ -143,7 +146,7 @@ namespace GameEngineApp.Engine
         void Log();
         void SetFrameRate(float frameRate);
         public event EventHandler<GameLoopedEventArgs> GameLooped;
-        public event EventHandler? GameRedraw;
+        public event EventHandler<DrawFrameEventArgs> GameRedraw;
         public event EventHandler? GameUpdate;
         public SomeDelegateCallback DelegateCallback { get; set; }
     }
@@ -154,6 +157,15 @@ namespace GameEngineApp.Engine
         public GameLoopedEventArgs(int loopCount) 
         {
             LoopCount = loopCount;
+        }
+    }
+
+    public class DrawFrameEventArgs : EventArgs
+    {
+        public bool DrawFrame { get; protected set; } = true;
+        public DrawFrameEventArgs(bool drawFrame)
+        {
+            DrawFrame = drawFrame;
         }
     }
 }
