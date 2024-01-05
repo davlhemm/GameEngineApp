@@ -17,7 +17,7 @@ namespace GameEngineApp.Engine
 
         private GameEngine() : base() { }
 
-        public GameEngine(VectorTwo screen, string? title, IRenderer renderer, IGameLoop gameLoop)
+        public GameEngine(IVectorTwo<float> screen, string? title, IRenderer renderer, IGameLoop gameLoop)
             : base(screen, title, renderer, gameLoop) { }
 
         public override void OnLoad()
@@ -46,7 +46,6 @@ namespace GameEngineApp.Engine
                     Logger.Info(String.Format("Map tile at [{1},{2}]: {0}", map.Tiles[i,j],i,j));
                 }
             }
-            SetFramerate(100f);
         }
 
         /// <summary>

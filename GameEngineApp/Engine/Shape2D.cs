@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
-    public class Shape2D : Entity
+    public class Shape2D : Entity, IShape2D
     {
         public VectorTwo? Position { get; set; } = null!;
         public VectorTwo? Scale { get; set; } = null!;
@@ -21,9 +21,20 @@ namespace GameEngineApp.Engine
             RegisterEntity();
         }
 
-        protected override void RegisterEntity()
+        public override void RegisterEntity()
         {
-            EngineBase.RegisterEntity(this);
+            EngineBase.RegisterShape(this);
         }
+
+        ~Shape2D() 
+        {
+            EngineBase.UnregisterShape(this);
+        }
+    }
+
+    public interface IShape2D : IEntity
+    {
+        VectorTwo? Position { get; set; }
+        VectorTwo? Scale { get; set; } 
     }
 }

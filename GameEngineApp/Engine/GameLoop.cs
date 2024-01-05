@@ -14,10 +14,11 @@ namespace GameEngineApp.Engine
     {
         public static int LoopCount = 0;
         //TODO: DI of FrameRate info struct here
-        public static bool GameLooping = false;
-        public static float FrameRateSkip = 2;
-        public static float FrameRate = 60.0f; //Frames/1000ms
-        public static float FrameDensityDiff = 2.5f; // BS Constant to review later
+        public static volatile bool GameLooping = false;
+        public static float FrameRateSkip = 1.5f;
+        public static float TickRate = 180.0f; //Frames/1000ms
+        public static float FrameDensityDiff = 3.5f; //TODO: BS Constant to review later
+        
         public event EventHandler<GameLoopedEventArgs>? GameLooped;
         public event EventHandler<DrawFrameEventArgs>? GameRedraw;
         public event EventHandler? GameUpdate;
@@ -28,11 +29,10 @@ namespace GameEngineApp.Engine
 
 
         public int Frames { get; set; } = 0;
-        //TODO: Queue of previous timings? 1-N?
         public long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
         public TimeSpan DeltaTime { get; set; } = TimeSpan.Zero;
         //TODO: Use more accurate method of delta-time, info being lost w/long instead of float here
-        public TimeSpan FPSDeltaTime { get; set; } = TimeSpan.Zero;
+        public TimeSpan TickDeltaTime { get; set; } = TimeSpan.Zero;
         ////TODO: Queue of previous timings? 1-N?
         //public static long PrevFrameTime { get; set; } = DateTime.Now.Ticks;
 
@@ -71,9 +71,11 @@ namespace GameEngineApp.Engine
                 //TODO: Change to static invocations or something...multicast delegates are slow
                 GameLooped?.Invoke(this, new GameLoopedEventArgs(LoopCount));
                 var drawThisFrame = LoopCount % FrameRateSkip == 0;
-                GameRedraw?.Invoke(this, new DrawFrameEventArgs(drawThisFrame));
+                if (drawThisFrame)
+                {
+                    GameRedraw?.Invoke(this, new DrawFrameEventArgs(drawThisFrame));
+                }
                 GameUpdate?.Invoke(this, new EventArgs());
-
 #if DEBUG
                 //DelegateCallback.Invoke();
 #endif
@@ -94,21 +96,24 @@ namespace GameEngineApp.Engine
 
         public virtual void Sleep()
         { 
-            float frameSleepTotal = (1000f / FrameRate) - FrameDensityDiff;
+            float frameSleepTotal = (1000f / TickRate) - FrameDensityDiff;
             float neededSleep = Math.Max(frameSleepTotal - DeltaTime.Milliseconds, 0);
             Thread.Sleep((int)(frameSleepTotal - neededSleep));
         }
 
+        /// <summary>
+        /// TODO: Separate calcs for frame renders and gameticks
+        /// </summary>
         private void ComputeFrames()
         {
             var currFrameTime = DateTime.Now.Ticks;
             DeltaTime = new TimeSpan(currFrameTime - PrevFrameTime);
 #if DEBUG //Only compute FPS for DEBUG
             //var currFrameRate = (int)((1.0f / DeltaTime.Milliseconds) * 1000.0f);
-            var FpsUpdateRate = 5f;
-            if ((Frames%(FrameRate/FpsUpdateRate)) == 0)
+            var TickUpdateRate = 5f;
+            if ((Frames%(TickRate/TickUpdateRate)) == 0)
             {
-                FPSDeltaTime = DeltaTime;
+                 TickDeltaTime = DeltaTime;
             }
             Debug.WriteLine("DeltaTime in ms: " + DeltaTime.Milliseconds);
 #endif
@@ -120,7 +125,7 @@ namespace GameEngineApp.Engine
         public void Stop()
         {
             GameLooping = false;
-            //TODO: Real thread management...
+            //TODO: Real thread management...check threads and synchronization context
             //GameLoopThread?.Suspend();
         }
 
@@ -132,7 +137,7 @@ namespace GameEngineApp.Engine
 
         public void SetFrameRate(float frameRate)
         {
-            FrameRate = frameRate;
+            TickRate = frameRate;
         }
     }
 

@@ -6,3 +6,9 @@ Fighter
 		Durability revamp
 		Elements/states
 	Full 2D
+
+TODO: 
+	Naive parallel sprite loading (task or thread)
+	scenes!
+	decoupling of framerate from physics/movement/calc ticks
+	feature for speed up/down multiplicative

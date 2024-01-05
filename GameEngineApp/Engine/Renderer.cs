@@ -32,12 +32,11 @@ namespace GameEngineApp.Engine
         {
             try
             {
-                //Debug.WriteLine("Refresh callback in canvas.");
                 if(e.DrawFrame)
                 {
                     var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
+                    Thread.Sleep(new TimeSpan(1));
                 }
-                //Refresh();
             } 
             catch
             {
@@ -67,15 +66,22 @@ namespace GameEngineApp.Engine
             }
 
             //Draw all entities
-            DrawShapes(ref graphics);
+            DrawShapes(ref graphics, ref EngineBase._shapes);
 #if DEBUG   //Draw FPS if debugging
-            DrawFPS(ref graphics, GameLoop.Instance.FPSDeltaTime);
+            DrawTimeSpan(ref graphics, GameLoop.Instance.TickDeltaTime, "tickspersec", 0.0f);
+            DrawTimeSpan(ref graphics, GameLoop.Instance.TickDeltaTime*GameLoop.FrameRateSkip, "fps", 24.0f);
 #endif
         }
 
-        private void DrawShapes(ref Graphics graphics)
+        /// <summary>
+        /// TODO: Actually draw based on entity type
+        /// TODO: Draw Images instead of rectangles
+        /// TODO: Z-indeces?
+        /// </summary>
+        /// <param name="graphics"></param>
+        private void DrawShapes(ref Graphics graphics, ref IList<IShape2D> shapes)
         {
-            foreach(var shape in EngineBase._shapes)
+            foreach(var shape in shapes)
             {
                 graphics.FillRectangle(TestSolidBrush, 
                     shape!.Position!.X, shape!.Position!.Y, 
@@ -83,14 +89,19 @@ namespace GameEngineApp.Engine
             }
         }
 
-        private void DrawFPS(ref Graphics graphics, TimeSpan deltaTimeSpan)
+        /// <summary>
+        /// TODO: Update this to new tick vs rendered frame method
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="deltaTimeSpan"></param>
+        private void DrawTimeSpan(ref Graphics graphics, TimeSpan deltaTimeSpan, string tag = "fps", float y = 0.0f)
         {
             var rightBound = graphics.ClipBounds.Right;
-            var dataString = ((int)((1.0f / deltaTimeSpan.Milliseconds) * 1000.0f)).ToString() + "fps";
+                var dataString = ((int)((1.0f / (deltaTimeSpan.Milliseconds)) * 1000.0f)).ToString() + tag;
             graphics.DrawString(dataString,
                 TestFont,
                 new SolidBrush(Color.Blue),
-                new PointF(rightBound-(dataString.Length*16f), 0.0f));
+                new PointF(rightBound-(dataString.Length*16f), y));
         }
     }
 

@@ -14,17 +14,17 @@ namespace GameEngineApp.Engine
     public abstract class EngineBase : IEngine
     {
         //Include any base game/engine details
-        protected VectorTwo _screen = new VectorTwo(512,512);
+        protected IVectorTwo<float> _screen = new VectorTwo(512,512);
         protected string? _title = "Base Title";
         protected Canvas _canvas = null!;
         protected IRenderer _renderer = null!;
         protected IGameLoop _gameLoop = null!;
         protected IInputManager inputManager = null!;
-        public static List<Shape2D> _shapes = new List<Shape2D>();
+        public static IList<IShape2D> _shapes = new List<IShape2D>();
 
         protected EngineBase() { }
 
-        public EngineBase(VectorTwo screen, string? title, IRenderer renderer, IGameLoop gameLoop)
+        public EngineBase(IVectorTwo<float> screen, string? title, IRenderer renderer, IGameLoop gameLoop)
         {
             _screen     = screen;
             _title      = title;
@@ -38,9 +38,7 @@ namespace GameEngineApp.Engine
             //Consider static/global entity management?
             _canvas.Paint += Render;
             _canvas.FormClosing += StopLoop;
-            //_canvas.KeyDown += KeyDownCallback;
-            //_canvas.KeyUp   += KeyUpCallback;
-            //_canvas.MouseMove += MouseMoveCallback;
+
             inputManager = new InputManager(ref _canvas);
 
             //Thread already active, just point the loop hooks to the right place
@@ -52,8 +50,6 @@ namespace GameEngineApp.Engine
 
             OnLoad();
             Start();
-
-            //gameLoop.DelegateCallback.Invoke();
 
             Application.Run(_canvas);
         }
@@ -113,12 +109,12 @@ namespace GameEngineApp.Engine
             OnUpdate();
         }
 
-        public static void RegisterEntity(Shape2D shape)
+        public static void RegisterShape(IShape2D shape)
         {
             _shapes.Add(shape);
         }
 
-        public static void UnregisterEntity(Shape2D shape)
+        public static void UnregisterShape(Shape2D shape)
         {
             _shapes.Remove(shape);
         }

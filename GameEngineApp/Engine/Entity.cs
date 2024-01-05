@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
-    public abstract class Entity
+    public abstract class Entity : IEntity
     {
         //Reference key for Dictionaries, etc.? GUID?
         public string Key { get; set; }
@@ -17,10 +17,15 @@ namespace GameEngineApp.Engine
         }
 
         //TODO: This is dumb as hell, need an entity factory to handle this anyway
-        protected abstract void RegisterEntity();
+        public abstract void RegisterEntity();
 
         ~Entity() { }
     }
 
+    public interface IEntity
+    {
+        string Key { get; }
+        void RegisterEntity();
 
+    }
 }
