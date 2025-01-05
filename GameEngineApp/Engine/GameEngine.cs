@@ -22,16 +22,18 @@ namespace GameEngineApp.Engine
 
         public override void OnLoad()
         {
+            var playerSize = ( 32, 32 );
             //New up a shape, registration already handled...
             Shape2D aShape = new Shape2D(
-                new VectorTwo(16, 16),
+                new VectorTwo(playerSize.Item1, playerSize.Item2),
                 new VectorTwo(16, 16),
                 "Shape");
-            player = new Shape2D(
-                new VectorTwo(64, 16),
-                new VectorTwo(16, 16),
-                "Player");
-            int mapChunkWidth = 32, mapChunkHeight = 32;
+            player = new Image2D(
+                new VectorTwo(64, playerSize.Item2),
+                new VectorTwo(playerSize.Item1, playerSize.Item2),
+                "Player",
+                "Images/player.png");
+            int mapChunkWidth = playerSize.Item1, mapChunkHeight = playerSize.Item2;
             for(int i = 0; i < map.Tiles.GetLength(0); i++)
             {
                 for(int j = 0; j < map.Tiles.GetLength(1); j++)
@@ -58,19 +60,19 @@ namespace GameEngineApp.Engine
             {
                 if(inputManager != null)
                 {
-                    if (inputManager.Up)
+                    if ((InputAction.Up & inputManager.CurrentInputAction) != 0)
                     {
                         player!.Position!.Y -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
-                    if (inputManager.Down)
+                    if ((InputAction.Down & inputManager.CurrentInputAction) != 0)
                     {
                         player!.Position!.Y += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
-                    if (inputManager.Left)
+                    if ((InputAction.Left & inputManager.CurrentInputAction) != 0)
                     {
                         player!.Position!.X -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }
-                    if (inputManager.Right)
+                    if ((InputAction.Right & inputManager.CurrentInputAction) != 0)
                     {
                         player!.Position!.X += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }

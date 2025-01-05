@@ -8,17 +8,24 @@ using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
+    public class InputMapping
+    {
+        public Dictionary<Keys, InputAction> InputMap { get; set; } = new()
+        {
+            { Keys.Up, InputAction.Up },
+            { Keys.Left, InputAction.Left },
+            { Keys.Right, InputAction.Right },
+            { Keys.Down, InputAction.Down },
+            { Keys.Space, InputAction.Jump },
+            { Keys.Escape, InputAction.Escape },
+        };
+    }
+
     public class InputManager : IInputManager
     {
-        public bool Up {  get; set; }
+        public InputMapping InputMapping { get; set; } = new();
 
-        public bool Down { get; set; }
-
-        public bool Left { get; set; }
-
-        public bool Right { get; set; }
-
-        public bool Escape { get; set; }
+        public InputAction CurrentInputAction { get; set; }
 
         public InputManager(ref Canvas canvas) 
         {
@@ -51,34 +58,38 @@ namespace GameEngineApp.Engine
         public void KeyMap(KeyEventArgs e, bool setTo)
         {
             //Keys flagUp = Keys.Up | Keys.W;
-            switch (e.KeyData)
+            var keyData = e.KeyData;
+            var currentSwitch = InputAction.None;
+            var foundKey = InputMapping.InputMap.TryGetValue(e.KeyData, out currentSwitch);
+            if (foundKey)
             {
-                case Keys.Up:
-                    Up = setTo;
-                    break;
-                case Keys.Down:
-                    Down = setTo;
-                    break;
-                case Keys.Left:
-                    Left = setTo;
-                    break;
-                case Keys.Right:
-                    Right = setTo;
-                    break;
-                case Keys.Escape: 
-                    Escape = setTo;
-                    break;
+                if(setTo)
+                {
+                    CurrentInputAction = CurrentInputAction | currentSwitch;
+                } else
+                {
+                    CurrentInputAction = CurrentInputAction & ~currentSwitch;
+                }
             }
         }
     }
 
+    // Flag for singular storage of all simultaneous inputs (probably stupid)
+    [Flags]
+    public enum InputAction
+    {
+        None = 0,
+        Up = 1 << 0,
+        Down = 1 << 1,
+        Left = 1 << 2,
+        Right = 1 << 3,
+        Jump = 1 << 4,
+        Escape = 1 << 5,
+    }
+
     public interface IInputManager
     {
-        bool Up { get; } 
-        bool Down { get; }
-        bool Left { get; }
-        bool Right { get; }
-        bool Escape { get; }
+        InputAction CurrentInputAction { get; }
         void KeyDown(object? sender, KeyEventArgs e);
         void KeyUp(object? sender, KeyEventArgs e);
         void MouseMove(object? sender, MouseEventArgs e);

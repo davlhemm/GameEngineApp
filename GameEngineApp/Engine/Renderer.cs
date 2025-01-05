@@ -34,7 +34,7 @@ namespace GameEngineApp.Engine
             {
                 if(e.DrawFrame)
                 {
-                    var result = BeginInvoke((MethodInvoker)delegate { Refresh(); });
+                    var result = Invoke((MethodInvoker)delegate { Refresh(); });
                     Thread.Sleep(new TimeSpan(1));
                 }
             } 
@@ -83,9 +83,10 @@ namespace GameEngineApp.Engine
         {
             foreach(var shape in shapes)
             {
-                graphics.FillRectangle(TestSolidBrush, 
-                    shape!.Position!.X, shape!.Position!.Y, 
-                    shape!.Scale!.X, shape!.Scale!.Y);
+                //graphics.FillRectangle(TestSolidBrush, 
+                //    shape!.Position!.X, shape!.Position!.Y, 
+                //    shape!.Scale!.X, shape!.Scale!.Y);
+                shape.DrawEntity(ref graphics);
             }
         }
 
