@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,19 +34,13 @@ namespace GameEngineApp.Engine
         public VectorTwo? Position { get; set; } = null!;
         public VectorTwo? Scale { get; set; } = null!;
 
-        protected Shape2D(): base("") { }
+        protected Shape2D(): base(string.Empty) { }
 
         public Shape2D(VectorTwo position, VectorTwo scale, string key): base(key)
         {
             Position = position;
             Scale = scale;
-            Key = key;
-            RegisterEntity();
-        }
-
-        public override void RegisterEntity()
-        {
-            EngineBase.RegisterShape(this);
+            // TODO: Don't make shapes register themselves...let the system
         }
 
         public virtual void DrawEntity(ref Graphics g)
@@ -54,9 +50,43 @@ namespace GameEngineApp.Engine
                 Scale!.X, Scale!.Y);
         }
 
-        ~Shape2D() 
+        //TODO: Provide entity system here, don't do this here (have the system manage this instead)
+        public void RegisterShape(ref IList<IShape2D> shapes)
         {
-            EngineBase.UnregisterShape(this);
+            shapes.Add(this);
+            var entities = shapes.Cast<IEntity>().ToList();
+            RegisterEntity(ref entities, Key);
+        }
+
+        public override void Update(IInputManager inputManager)
+        {
+            var playerSpeed = GameEngine.playerSpeed;
+            var loopSpeed = (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
+            //TODO: Normalize vector for movement before changing coordinates...
+            //TODO: Calculated vector instead of piecemeal change
+            if ((InputAction.Up & inputManager.CurrentInputAction) != 0)
+            {
+                Position!.Y -= playerSpeed * loopSpeed;
+            }
+            if ((InputAction.Down & inputManager.CurrentInputAction) != 0)
+            {
+                Position!.Y += playerSpeed * loopSpeed;
+            }
+            if ((InputAction.Left & inputManager.CurrentInputAction) != 0)
+            {
+                Position!.X -= playerSpeed * loopSpeed;
+            }
+            if ((InputAction.Right & inputManager.CurrentInputAction) != 0)
+            {
+                Position!.X += playerSpeed * loopSpeed;
+            }
+            base.Update(inputManager);
+        }
+
+        //TODO: Provide entity system here
+        ~Shape2D()
+        {
+            
         }
     }
 

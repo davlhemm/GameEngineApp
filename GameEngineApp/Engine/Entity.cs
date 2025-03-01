@@ -17,15 +17,38 @@ namespace GameEngineApp.Engine
         }
 
         //TODO: This is dumb as hell, need an entity factory to handle this anyway
-        public abstract void RegisterEntity();
+        public virtual void RegisterEntity(ref List<IEntity> entities, string key)
+        {
+            // entities.Remove(entities.First(x => x.Key.Equals(key)));
+        }
 
-        ~Entity() { }
+        public virtual void Update(IInputManager inputManager)
+        {
+            // throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnregisterEntity(ref List<IEntity> entities, string key)
+        {
+            entities.Remove(entities.First(x => x.Key.Equals(key)));
+        }
+
+        ~Entity() 
+        { 
+            Dispose(); 
+        }
     }
 
-    public interface IEntity
+    public interface IEntity : IDisposable
     {
         string Key { get; }
-        void RegisterEntity();
+        void RegisterEntity(ref List<IEntity> entities, string key);
+        void UnregisterEntity(ref List<IEntity> entities, string key);
+        void Update(IInputManager inputManager);
 
     }
 }

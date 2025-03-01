@@ -82,7 +82,7 @@ namespace GameEngineApp.Engine
 
                 LoopCount++;
 
-                Log();
+                //Log();
 
                 Sleep();
             }
@@ -115,7 +115,7 @@ namespace GameEngineApp.Engine
             {
                  TickDeltaTime = DeltaTime;
             }
-            Debug.WriteLine("DeltaTime in ms: " + DeltaTime.Milliseconds);
+            //Debug.WriteLine("DeltaTime in ms: " + DeltaTime.Milliseconds);
 #endif
             PrevFrameTime = currFrameTime;
 

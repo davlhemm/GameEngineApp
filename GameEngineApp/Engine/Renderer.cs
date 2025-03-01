@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing.Text;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace GameEngineApp.Engine
 {
@@ -14,7 +7,7 @@ namespace GameEngineApp.Engine
     {
         public Canvas() 
         {
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
         }
 
         public override void Refresh()
@@ -50,13 +43,10 @@ namespace GameEngineApp.Engine
     public abstract class RendererBase : IRenderer
     {
         //TODO: Manage with entity-component-system, this is stupid
-
-        //private static readonly Pen TestPen = new Pen(Color.White, 8);
-        private static readonly SolidBrush TestSolidBrush = new SolidBrush(Color.Cyan);
         private static readonly FontFamily TestFontFam = new FontFamily(GenericFontFamilies.Monospace);
         private static readonly Font TestFont = new Font(TestFontFam, 16.0f, FontStyle.Bold);
 
-        public virtual void Render(object? sender, PaintEventArgs e)
+        public virtual void Render(object? sender, PaintEventArgs e, IList<IShape2D> shapes)
         {
             //Get graphics from paint event
             Graphics graphics = e.Graphics;
@@ -66,7 +56,7 @@ namespace GameEngineApp.Engine
             }
 
             //Draw all entities
-            DrawShapes(ref graphics, ref EngineBase._shapes);
+            DrawShapes(ref graphics, ref shapes);
 #if DEBUG   //Draw FPS if debugging
             DrawTimeSpan(ref graphics, GameLoop.Instance.TickDeltaTime, "tickspersec", 0.0f);
             DrawTimeSpan(ref graphics, GameLoop.Instance.TickDeltaTime*GameLoop.FrameRateSkip, "fps", 24.0f);
@@ -83,9 +73,6 @@ namespace GameEngineApp.Engine
         {
             foreach(var shape in shapes)
             {
-                //graphics.FillRectangle(TestSolidBrush, 
-                //    shape!.Position!.X, shape!.Position!.Y, 
-                //    shape!.Scale!.X, shape!.Scale!.Y);
                 shape.DrawEntity(ref graphics);
             }
         }
@@ -98,7 +85,7 @@ namespace GameEngineApp.Engine
         private void DrawTimeSpan(ref Graphics graphics, TimeSpan deltaTimeSpan, string tag = "fps", float y = 0.0f)
         {
             var rightBound = graphics.ClipBounds.Right;
-                var dataString = ((int)((1.0f / (deltaTimeSpan.Milliseconds)) * 1000.0f)).ToString() + tag;
+            var dataString = ((int)(1.0f / deltaTimeSpan.Milliseconds * 1000.0f)).ToString() + tag;
             graphics.DrawString(dataString,
                 TestFont,
                 new SolidBrush(Color.Blue),
@@ -108,6 +95,6 @@ namespace GameEngineApp.Engine
 
     public interface IRenderer
     {
-        public void Render(object? sender, PaintEventArgs e);
+        public void Render(object? sender, PaintEventArgs e, IList<IShape2D> shapes);
     }
 }

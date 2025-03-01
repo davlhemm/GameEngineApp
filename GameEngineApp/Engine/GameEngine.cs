@@ -1,18 +1,11 @@
 ﻿using GameEngineApp.Tools;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameEngineApp.Engine
 {
     public class GameEngine : EngineBase
     {
         Shape2D player = null!;
-        float playerSpeed = 0.2f;
+        public static float playerSpeed = 0.2f;
         Map map = new Map();
 
         private GameEngine() : base() { }
@@ -22,17 +15,15 @@ namespace GameEngineApp.Engine
 
         public override void OnLoad()
         {
-            var playerSize = ( 32, 32 );
-            //New up a shape, registration already handled...
-            Shape2D aShape = new Shape2D(
-                new VectorTwo(playerSize.Item1, playerSize.Item2),
-                new VectorTwo(16, 16),
-                "Shape");
+            var playerSize = (baseSize, baseSize);
+            //New up a shape
+            // TODO: Maybe inject shape/entity system to keep track of registration instead
             player = new Image2D(
                 new VectorTwo(64, playerSize.Item2),
                 new VectorTwo(playerSize.Item1, playerSize.Item2),
                 "Player",
-                "Images/player.png");
+                "Images/player.jpg");
+            player.RegisterShape(ref _shapes);
             int mapChunkWidth = playerSize.Item1, mapChunkHeight = playerSize.Item2;
             for(int i = 0; i < map.Tiles.GetLength(0); i++)
             {
@@ -40,14 +31,16 @@ namespace GameEngineApp.Engine
                 {
                     if (map.Tiles[i,j] != "")
                     {
-                        new Shape2D(
+                        var newShape = new Shape2D(
                             new VectorTwo(mapChunkWidth * j, mapChunkHeight * i),
                             new VectorTwo(mapChunkWidth, mapChunkHeight), 
                             "Map");
+                        newShape.RegisterShape(ref _shapes);
                     }
-                    Logger.Info(String.Format("Map tile at [{1},{2}]: {0}", map.Tiles[i,j],i,j));
+                    //Logger.Info($"Map tile at [{i},{j}]: {map.Tiles[i, j]}");
                 }
             }
+            base.OnLoad();
         }
 
         /// <summary>
@@ -60,35 +53,23 @@ namespace GameEngineApp.Engine
             {
                 if(inputManager != null)
                 {
-                    if ((InputAction.Up & inputManager.CurrentInputAction) != 0)
-                    {
-                        player!.Position!.Y -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
-                    }
-                    if ((InputAction.Down & inputManager.CurrentInputAction) != 0)
-                    {
-                        player!.Position!.Y += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
-                    }
-                    if ((InputAction.Left & inputManager.CurrentInputAction) != 0)
-                    {
-                        player!.Position!.X -= playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
-                    }
-                    if ((InputAction.Right & inputManager.CurrentInputAction) != 0)
-                    {
-                        player!.Position!.X += playerSpeed * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
-                    }
+                    player.Update(inputManager);
                 }
             }
 
             //TODO: deltaTime/2 trick for frame-rate independent update consistency
-            //TODO: Apply physics...update object locations
-            foreach (var shape in EngineBase._shapes)
+            //TODO: This is the physics system.  Apply physics...update object locations
+            foreach (var shape in _shapes)
             {
+                // TODO: System based update that gets called in groups for entities registered within each category
+                // shape.Update(inputManager!);
                 //Move a percentage of X blocks downward until floor reached (screen height)
                 //TODO: Figure out inconsistent wall boundary
                 if ((shape?.Position?.Y + 2 * shape?.Scale?.Y) < (_canvas.Size.Height - 2 * shape?.Scale?.Y))
                 {
                     //TODO: Gravity, speed(s), direction(s)
-                    if(shape?.Key != "Map")
+                    //TODO: Entity tagging for physics system
+                    if(shape?.Key != nameof(Map))
                     {
                         shape!.Position!.Y += 0.1f * (float)GameLoop.Instance.DeltaTime.TotalMilliseconds;
                     }

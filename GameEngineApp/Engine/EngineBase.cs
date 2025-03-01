@@ -1,13 +1,6 @@
 ﻿using GameEngineApp.Tools;
-using Microsoft.VisualBasic.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing.Printing;
 
 namespace GameEngineApp.Engine
 {
@@ -19,10 +12,14 @@ namespace GameEngineApp.Engine
         protected Canvas _canvas = null!;
         protected IRenderer _renderer = null!;
         protected IGameLoop _gameLoop = null!;
-        protected IInputManager inputManager = null!;
-        public static IList<IShape2D> _shapes = new List<IShape2D>();
+        protected IInputManager inputManager;
+        //TODO: Render entity system, pass to renderer
+        public IList<IShape2D> _shapes = new List<IShape2D>();
+        public int baseSize = 32;
 
-        protected EngineBase() { }
+        protected EngineBase() {
+            inputManager = null!;
+        }
 
         public EngineBase(IVectorTwo<float> screen, string? title, IRenderer renderer, IGameLoop gameLoop)
         {
@@ -36,7 +33,7 @@ namespace GameEngineApp.Engine
             _canvas.Text = title;
             //TODO: Intercept this renderer callback and let it know what to draw...
             //Consider static/global entity management?
-            _canvas.Paint += Render;
+            _canvas.Paint += (sender, e) => Render(sender, e, ref _shapes);
             _canvas.FormClosing += StopLoop;
 
             inputManager = new InputManager(ref _canvas);
@@ -59,9 +56,9 @@ namespace GameEngineApp.Engine
             Logger.Info("Delegate Ran in Engine, triggered from invocation.");
         }
 
-        private void Render(object? sender, PaintEventArgs e)
+        private void Render(object? sender, PaintEventArgs e, ref IList<IShape2D> shapes)
         {
-            _renderer.Render(sender, e);
+            _renderer.Render(sender, e, shapes);
         }
 
         private void StopLoop(object? sender, FormClosingEventArgs e)
@@ -78,10 +75,13 @@ namespace GameEngineApp.Engine
         /// Load whatever bullshit occurs before gameloop
         /// Asset management, etc.
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
         public virtual void OnLoad()
         {
-            Debug.WriteLine("OnLoad()");
+            Shape2D aShape = new Shape2D(
+            new VectorTwo(baseSize, baseSize),
+                new VectorTwo(16, 16),
+                "Shape");
+            aShape.RegisterShape(ref _shapes);
         }
 
         public virtual void Start()
@@ -91,12 +91,12 @@ namespace GameEngineApp.Engine
 
         public virtual void OnDraw()
         {
-            Debug.WriteLine("OnDraw()");
+            //Debug.WriteLine("OnDraw()");
         }
 
         public virtual void OnUpdate()
         {
-            Debug.WriteLine("OnUpdate()");
+            //Debug.WriteLine("OnUpdate()");
         }
 
         public void OnDrawCallback(object? sender, GameLoopedEventArgs e)
@@ -107,16 +107,6 @@ namespace GameEngineApp.Engine
         public void OnUpdateCallback(object? sender, EventArgs e)
         {
             OnUpdate();
-        }
-
-        public static void RegisterShape(IShape2D shape)
-        {
-            _shapes.Add(shape);
-        }
-
-        public static void UnregisterShape(Shape2D shape)
-        {
-            _shapes.Remove(shape);
         }
 
         public void SetFramerate(float framerate)
